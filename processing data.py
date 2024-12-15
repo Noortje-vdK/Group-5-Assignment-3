@@ -14,6 +14,30 @@ df = df.drop_duplicates() #drops the second occurance of duplicated rows
 df = df.dropna() #drows rows with missing values
 df = df.drop(df[(df['target_feature'] != 0) & (df['target_feature'] != 1)].index) #drops rows that have a non-binary value for the column 'target_feature'
 
-df.head()
+df.head() #print first 5 rows to check if changes were made correctly
+
+#calculating descriptors
+def getMolDescriptors(mol, missingVal=None):
+    """calculates the full list of descriptors for a molecule
+    if a descriptor can not be calculated missingVal is used"""
+    res = {} #initializing dictionary for the name of each decriptor and its value for the molecule
+    for name, func in Descriptors._descList: #iterating through descriptors
+        #checking for erros
+        try:
+            value = func(mol) #calculates the descriptor for the molecule
+        except:
+            import traceback
+            traceback.print_exc() #prints error message if an error occurs
+            value = missingVal #sets the value to missingVal if an error occurs
+        
+        res[name] = value #adding the descriptor and its value to the dictionary
+        return res
+
+for row in df.values:
+    smile_molc = row[0] #saving the molecule in smile form in a variable
+    molc_descr = getMolDescriptors(row) #calculating the descriptors for the molecule
+    break #break om beter te kunnen kijken waar het fout gaat
+
+
 
 
