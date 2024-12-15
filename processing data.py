@@ -12,11 +12,8 @@ df = data #taking a copy of the origional data
 
 df = df.drop_duplicates() #drops the second occurance of duplicated rows
 df = df.dropna() #drows rows with missing values
-
-#dit moet nog even gecheckt worden
-for row in df[df.columns[-1]]: #iterates though the rows
-    if row != 1 and row != 0:
-        df.drop(row, axis=0) #drops row if the binary column contains a non-binary value
+df = df.drop(df[(df['target_feature'] != 0) & (df['target_feature'] != 1)].index) #drops rows that have a non-binary value for the column 'target_feature'
 
 df.head()
+
 
