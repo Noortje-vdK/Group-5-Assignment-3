@@ -1,6 +1,7 @@
 import pandas
 import numpy as np
 import random
+import math
 random.seed(10)
 
 file = pandas.read_csv("breast_cancer.csv") #Use the pandas module to extract the data and put it in a dictionary called file
@@ -111,8 +112,8 @@ class Decision_Tree():
     
         for i in range(len(data[0])-1):#Loop over all attributes, except the target value at the end
             possible_thresholds = set() #Make a set to store unique possible thresholds
-            for j in range(len(data)): 
-                possible_thresholds.add((data[j][i])) #Add all unique points to the possible thresholds
+            for j in range(int(len(data)/10)): 
+                possible_thresholds.add((data[j*10][i])) #Add all unique points to the possible thresholds
         
             for threshold in possible_thresholds: #Loop over all thresholds
                 data_left, data_right, y, y_left, y_right = self.split(data, i, threshold) #split the data to check each threshold
@@ -202,33 +203,45 @@ class Decision_Tree():
             return self.make_prediction(x, tree.left) #Recursion to go down the left path of the node
         else:
             return self.make_prediction(x, tree.right) #Recursion to go down the right path of the node
-
-i = 0
+practice = Decision_Tree()
+train_data, val_data, test_data = practice.train_test_split(data)
+k = 0
 all_predictions = []
 nr_trees = 1
-while i < nr_trees:
+while k < nr_trees:
     Tree = Decision_Tree()#Make a new tree called Tree
     #train_data, val_data, test_data = Tree.train_test_split(data) #Split the data set
-    root = Tree.grow_tree(data) #Make a root of the tree using 
+    reduced_data = []
+    reduced_test_data = []
+    for i in range (int(math.sqrt(len(train_data)))):
+        j = random.randint(0,(len(train_data)-1))
+        reduced_data.append(train_data[j])
+        reduced_test_data.append(test_data[j])
+    reduced_data.append(train_data[-1])
+
+    root = Tree.grow_tree(reduced_data) #Make a root of the tree using 
     #Tree.print_tree(root) #Print the tree
     
-    Y_pred = Tree.predict(data, root) #Make a list of all predicted y for the test data
+    Y_pred = Tree.predict(reduced_data, root) #Make a list of all predicted y for the test data
     all_predictions.append(Y_pred)
-    i += 1
+
+    k += 1
 
 predictions = []
-print([sublist[0] for sublist in all_predictions])
 for i in range(len(all_predictions[0])):
+    predictions.append(list(sublist[i] for sublist in all_predictions))
 
+final = []
+for i in range(len(predictions)):
+    final.append(max(set(predictions[i]), key=predictions[i].count))
+
+for i in range(len(final)):
+    print(f'feature {i}: {final[i]}')
     
-    predictions.append(sublist[i] for sublist in all_predictions)
-    #print(predictions)
+correct = 0 #Initialize amount of correct predictions
+for i in range(len(final)): #Loopover all predicted targets
+      if final[i] == test_data[i][-1]: #Check if the prediction is the same as the validation set
+          correct += 1
 
-
-# correct = 0 #Initialize amount of correct predictions
-# for i in range(len(Y_pred)): #Loopover all predicted targets
-#     if Y_pred[i] == test_data[i][-1]: #Check if the prediction is the same as the validation set
-#         correct += 1
-
-# accuracy = correct/len(Y_pred) #Calculates the accuracy of the predictions
-# print(f"The predictions of Y were {accuracy*100} percent accurate.")
+accuracy = correct/len(final) #Calculates the accuracy of the predictions
+print(f"The predictions of Y were {accuracy*100} percent accurate.")

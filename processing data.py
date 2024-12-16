@@ -40,6 +40,7 @@ for row in df.values:
     smile_molc = row[0] #saving the molecule in smile form in a variable
     mol = Chem.MolFromSmiles(smile_molc)
     molc_descr = getMolDescriptors(mol) #calculating the descriptors for the molecule
+    print(molc_descr)
     break #break om beter te kunnen kijken waar het fout gaat
 
 def train_test_sets(X):
@@ -49,6 +50,6 @@ def train_test_sets(X):
     return X_train, X_test, y_train, y_test
 
 X_train, X_test, y_train, y_test = train_test_sets(df)
-
+print(X_train)
 
 
