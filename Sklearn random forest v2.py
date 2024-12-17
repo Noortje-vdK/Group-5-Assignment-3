@@ -1,5 +1,6 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import balanced_accuracy_score
 from sklearn.model_selection import train_test_split
 from processing data import X_train, X_test, Y_train, Y_test
 
@@ -7,4 +8,6 @@ random_forest = RandomForestClassifier(n_estimators=5, criterion='gini', max_dep
 random_forest.fit(X_train, Y_train)
 y_pred = random_forest.predict(X_test)
 accuracy = accuracy_score(Y_test, y_pred)
+balanced_accuracy = balanced_accuracy_score(Y_test, y_pred)
 print("Accuracy:", accuracy)
+print("Balanced Accuracy:", balanced_accuracy)
