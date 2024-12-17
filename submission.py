@@ -66,21 +66,15 @@ new_data_descriptors_df = new_data_descriptors_df.fillna(0)
 
 # Make predictions using the trained model
 predictions = random_forest.predict(new_data_descriptors_df)
-
-# Print the predictions to verify
-print("Predictions:", predictions)
-print("Prediction distribution:", pd.Series(predictions).value_counts())
+#print("Predictions:", predictions)
+#print("Prediction distribution:", pd.Series(predictions).value_counts())
 
 # Add predictions to the original data
 new_data['target_feature'] = predictions
-
-# Ensure the target_feature column is of integer type
 new_data['target_feature'] = new_data['target_feature'].astype(str)
-print(new_data.dtypes)
-# Inspect the DataFrame before saving
-print(new_data[['Unique_ID', 'target_feature']].head(20))  # Print the first 20 rows for inspection
+#print(new_data.dtypes)
+#print(new_data[['Unique_ID', 'target_feature']].head(20))  # Print the first 20 rows for inspection
 
-# Save the predictions along with the 'Unique_ID' column to a new CSV file
 new_data[['Unique_ID', 'target_feature']].to_csv('predictions_output7.csv', index=False, quoting=1)
 
 print("Predictions saved to 'predictions_output.csv'")
