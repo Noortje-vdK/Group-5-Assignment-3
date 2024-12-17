@@ -7,17 +7,11 @@ from sklearn.model_selection import train_test_split
 data_file = "train.csv"
 data = pd.read_csv(data_file)
 
-#data.head(1) #print first 5 rows to check if the data is loaded correctly (does only work in jupiter notebook)
-
 #preprocessing data
 df = data #taking a copy of the original data
-
 df = df.drop_duplicates() #drops the second occurrence of duplicated rows
 df = df.dropna() #drops rows with missing values
 df = df.drop(df[(df['target_feature'] != 0) & (df['target_feature'] != 1)].index) #drops rows that have a non-binary value for the column 'target_feature'
-
-df.head() #print first 5 rows to check if changes were made correctly
-
 
 #calculating descriptors
 def getMolDescriptors(mol, missingVal=None):
