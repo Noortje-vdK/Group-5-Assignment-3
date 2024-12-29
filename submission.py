@@ -48,7 +48,7 @@ def train_test_sets(X):
 
 X_train, X_test, y_train, y_test = train_test_sets(result_df)
 
-random_forest = RandomForestClassifier(n_estimators=5, criterion='gini', max_depth=6, min_samples_split=2, min_samples_leaf=1, max_features='sqrt', random_state=42, class_weight = "balanced")
+random_forest = RandomForestClassifier(bootstrap= False, max_depth= 20, max_features= 'sqrt', min_samples_leaf= 4, min_samples_split= 2, n_estimators= 50, random_state=42, class_weight = "balanced")
 random_forest.fit(X_train, y_train)
 
 new_data = pd.read_csv('test.csv')
@@ -75,6 +75,6 @@ new_data['target_feature'] = new_data['target_feature'].astype(str)
 #print(new_data.dtypes)
 #print(new_data[['Unique_ID', 'target_feature']].head(20))  # Print the first 20 rows for inspection
 
-new_data[['Unique_ID', 'target_feature']].to_csv('predictions_output7.csv', index=False, quoting=1)
+new_data[['Unique_ID', 'target_feature']].to_csv('predictions_output8.csv', index=False, quoting=1)
 
 print("Predictions saved to 'predictions_output.csv'")

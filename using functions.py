@@ -12,14 +12,14 @@ final_df = pd.concat([training_data.reset_index(drop=True), train_descriptors], 
 
 X_train = final_df.drop(columns=["SMILES_canonical", "target_feature"], axis=1)
 y_train = final_df["target_feature"]
-X_train, X_test, y_train, y_test = train_test_sets(final_df)
-random_forest = RandomForestClassifier(n_estimators=411, criterion='gini', max_depth=None, min_samples_split=10, min_samples_leaf=1, max_features='auto', random_state=42, class_weight = "balanced")
+#X_train, X_test, y_train, y_test = train_test_sets(final_df)
+random_forest = RandomForestClassifier(n_estimators= 1000, min_samples_split= 8, min_samples_leaf= 4, max_features= 'auto', max_depth= 15, criterion= 'entropy', class_weight= 'balanced_subsample', bootstrap= False)
 random_forest.fit(X_train, y_train)
 
-y_pred = random_forest.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
-balanced_accuracy = balanced_accuracy_score(y_test, y_pred)
-print("Accuracy:", accuracy)
-print("Balanced Accuracy:", balanced_accuracy)
-#test = submission(random_forest, "predictions_output2.csv")
+#y_pred = random_forest.predict(X_test)
+#accuracy = accuracy_score(y_test, y_pred)
+#balanced_accuracy = balanced_accuracy_score(y_test, y_pred)
+#print("Accuracy:", accuracy)
+#print("Balanced Accuracy:", balanced_accuracy)
+test = submission(random_forest, "predictions_output8.csv")
 
