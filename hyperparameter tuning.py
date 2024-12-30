@@ -10,7 +10,6 @@ def hyperparameters_randomsearch(data_path):
     """
     Perform hyperparameter tuning for a RandomForestClassifier using RandomizedSearchCV.
     """
-    # Hyperparameter grid
     n_estimators = [int(x) for x in np.linspace(start=100, stop=1000, num=10)]
     max_features = ['log2', 'sqrt', 'auto']
     max_depth = [int(x) for x in np.linspace(5, 100, num=10)]
@@ -29,13 +28,10 @@ def hyperparameters_randomsearch(data_path):
         'min_samples_leaf': min_samples_leaf,
         'bootstrap': bootstrap,
         'criterion': criterion,
-        'class_weight': class_weight
-    }
+        'class_weight': class_weight}
 
-    # Base model for RandomizedSearchCV
     rf = RandomForestClassifier(random_state=42)
 
-    # RandomizedSearchCV setup
     rf_random = RandomizedSearchCV(
         estimator=rf,
         param_distributions=random_grid,
@@ -67,17 +63,19 @@ def hyperparameters_randomsearch(data_path):
 #print(f"Best hyperparameters from random search: {best_params_random}")
 
 def hyperparameters_gridsearch(training_data):
+    """
+    Perform hyperparameter tuning for a RandomForestClassifier using GridSearchCV.
+    """
     param_grid = {
-        'n_estimators': [200, 500, 750, 1000, 1500],
-        'max_depth': [10, 20, 30, 50, None],
+        'n_estimators': [1000, 1200, 1400],
+        'max_depth': [12, 14, 16, None],
         'max_features': ['sqrt', 'log2', 'auto'],
-        'min_samples_split': [2, 5, 8, 10],
-        'min_samples_leaf': [1, 2, 4, 6],
+        'min_samples_split': [7, 8, 9],
+        'min_samples_leaf': [3, 4, 5],
         'bootstrap': [True, False],
         'criterion' : ["gini", 'entropy'],
         'class_weight' : ['balanced', 'balanced_subsample']}
 
-        
     training_data = data_processing(training_data, True)
     train_descriptors = calculate_descriptors(training_data)
     final_df = pd.concat([training_data.reset_index(drop=True), train_descriptors], axis=1)
@@ -91,8 +89,7 @@ def hyperparameters_gridsearch(training_data):
         cv=3,
         n_jobs=-1,
         verbose=2,
-        scoring='balanced_accuracy'
-    )
+        scoring='balanced_accuracy')
 
     grid_search.fit(X_train, y_train)
 
