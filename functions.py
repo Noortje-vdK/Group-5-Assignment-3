@@ -4,6 +4,7 @@ from rdkit.Chem import Descriptors
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, balanced_accuracy_score
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
 
 def data_processing(filename, train = True):
     """Reads in data from file, removes rows with missing data and duplicate rows, and if the data is training data, it removes non-binary
@@ -50,12 +51,13 @@ def train_test_sets(X):
     X_train, X_test, y_train, y_test = train_test_split(input, output, test_size=0.2, random_state=42)
     return X_train, X_test, y_train, y_test
 
-def submission(model, newfile, testfile="test.csv"):
+def submission(model, newfile, scaler, testfile="test.csv"):
     """Creates a csv file that predicts the target feature for testfile"""
     new_data = data_processing(testfile, False)
     new_descriptors = calculate_descriptors(new_data)
     new_descriptors.fillna(0)
-    predictions = model.predict(new_descriptors)
+    new_descriptors_scaled = scaler.transform(new_descriptors)
+    predictions = model.predict(new_descriptors_scaled)
     new_data['target_feature'] = predictions
     new_data['target_feature'] = new_data['target_feature'].astype(str)
     new_data[['Unique_ID', 'target_feature']].to_csv(newfile, index=False, quoting=1)
