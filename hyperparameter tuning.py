@@ -7,10 +7,10 @@ from sklearn.model_selection import GridSearchCV
 from functions import data_processing, scaling, train_test_sets, remove_correlated_variables, calculate_descriptors
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
 
+scaler = StandardScaler()
+
 def hyperparameters_randomsearch(filename):
-    """
-    Perform hyperparameter tuning for a RandomForestClassifier using RandomizedSearchCV.
-    """
+    """Perform hyperparameter tuning for a RandomForestClassifier using RandomizedSearchCV."""
     n_estimators = [int(x) for x in np.linspace(start=500, stop=1500, num=15)]
     max_features = ['log2', 'sqrt', 'auto']
     max_depth = [int(x) for x in np.linspace(20, 400, num=12)]
@@ -45,9 +45,7 @@ def hyperparameters_randomsearch(filename):
     training_data = data_processing(filename, True)
     train_descriptors = calculate_descriptors(training_data)
     final_df = pd.concat([training_data.reset_index(drop=True), train_descriptors], axis=1)
-    data = remove_correlated_variables(final_df, 0.9)
-    scaler = StandardScaler()
-    X_train, X_test, y_train, y_test = train_test_sets(data)
+    X_train, X_test, y_train, y_test = train_test_sets(final_df)
     X_train_scaled = scaling(X_train, scaler)
     X_test_scaled = scaling(X_test, scaler, False)
 
@@ -62,15 +60,10 @@ def hyperparameters_randomsearch(filename):
     print(f"Best hyperparameters: {best_params}")
     print(f"Balanced accuracy with best model: {balanced_accuracy}")
 
-    return best_params
-
-#best_params_random = hyperparameters_randomsearch("train.csv")
-#print(f"Best hyperparameters from random search: {best_params_random}")
+best_params_random = hyperparameters_randomsearch("train.csv")
 
 def hyperparameters_gridsearch(filename):
-    """
-    Perform hyperparameter tuning for a RandomForestClassifier using GridSearchCV.
-    """
+    """Perform hyperparameter tuning for a RandomForestClassifier using GridSearchCV."""
     param_grid = {
         'n_estimators': [1000, 1200, 1400],
         'max_depth': [120, 160, 190, None],
@@ -84,9 +77,7 @@ def hyperparameters_gridsearch(filename):
     training_data = data_processing(filename, True)
     train_descriptors = calculate_descriptors(training_data)
     final_df = pd.concat([training_data.reset_index(drop=True), train_descriptors], axis=1)
-    data = remove_correlated_variables(final_df, 0.9)
-    scaler = StandardScaler()
-    X_train, X_test, y_train, y_test = train_test_sets(data)
+    X_train, X_test, y_train, y_test = train_test_sets(final_df)
     X_train_scaled = scaling(X_train, scaler)
     X_test_scaled = scaling(X_test, scaler, False)
 
@@ -111,4 +102,4 @@ def hyperparameters_gridsearch(filename):
     print(f"Best hyperparameters: {best_params}")
     print(f"Balanced accuracy of the best model: {balanced_accuracy}")
     
-run = hyperparameters_gridsearch("train.csv")
+#run = hyperparameters_gridsearch("train.csv")
