@@ -36,7 +36,7 @@ def testing_accuracy(dataframe, rf_params):
     print("Accuracy:", accuracy)
     print("Balanced Accuracy:", balanced_accuracy)
 
-#testrun = testing_accuracy(final_df, rf_parameters)
+testrun = testing_accuracy(final_df, rf_parameters)
 
 def create_submission_randomforest(dataframe, rf_params, newfilename):
     """Trains a random forest model with all training data to create a csv file to use for submission in Kaggle.

@@ -45,10 +45,10 @@ def calculate_descriptors(df):
 
 def remove_correlated_variables(data, threshold):
     """From data that only has numerical or binary columns, remove columns with variables that are highly correlated: 
-    that have a correlation value above the threshold."""
+    that have a correlation coefficient above the threshold."""
     corr_matrix = data.drop(columns=["target_feature"]).corr()
     upper_triangle = corr_matrix.where(np.triu(np.ones(corr_matrix.shape, dtype=bool), k=1)) # look only at upper triangle without diagonal to prevent removing both variables if correlated
-    to_drop = [col for col in upper_triangle.columns if any(upper_triangle[col] > threshold)] 
+    to_drop = [col for col in upper_triangle.columns if any(upper_triangle[col] > threshold)] # drop columns if correlation coefficient exceeds threshold
     return data.drop(columns=to_drop)
 
 def train_test_sets(X):
@@ -67,7 +67,7 @@ def scaling(data, scaler, fit = True):
         return scaler.transform(data)
 
 def submission(model, newfile, scaler, testfile="test.csv"):
-    """Creates a csv file that predicts the target feature for testfile"""
+    """Processes a new file, predicts the output for this file and write a new csv file with the results."""
     new_data = data_processing(testfile, False)
     new_descriptors = calculate_descriptors(new_data)
     new_descriptors.fillna(0, inplace= True)
