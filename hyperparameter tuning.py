@@ -11,15 +11,15 @@ scaler = StandardScaler()
 
 def hyperparameters_randomsearch(filename):
     """Perform hyperparameter tuning for a RandomForestClassifier using RandomizedSearchCV."""
-    n_estimators = [int(x) for x in np.linspace(start=500, stop=1500, num=15)]
-    max_features = ['log2', 'sqrt', 'auto']
-    max_depth = [int(x) for x in np.linspace(20, 400, num=12)]
+    n_estimators = [int(x) for x in np.linspace(start=750, stop=1750, num=20)]
+    max_features = ['sqrt']
+    max_depth = [int(x) for x in np.linspace(70, 200, num=15)]
     max_depth.append(None)
-    min_samples_split = [int(x) for x in np.linspace(start=2, stop=20, num=6)]
-    min_samples_leaf = [int(x) for x in np.linspace(start=1, stop=10, num=6)]
-    bootstrap = [True, False]
-    criterion = ["gini", 'entropy']
-    class_weight = ['balanced', 'balanced_subsample']
+    min_samples_split = [int(x) for x in np.linspace(start=2, stop=12, num=6)]
+    min_samples_leaf = [int(x) for x in np.linspace(start=4, stop=8, num=4)]
+    bootstrap = [False]
+    criterion = ['entropy']
+    class_weight = ['balanced']
 
     random_grid = {
         'n_estimators': n_estimators,

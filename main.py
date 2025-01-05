@@ -10,7 +10,6 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
 training_data = data_processing("train.csv")
 train_descriptors = calculate_descriptors(training_data)
 final_df = pd.concat([training_data.reset_index(drop=True), train_descriptors], axis=1) # put the descriptors next to existing columns
-data = remove_correlated_variables(final_df, 0.95)
 scaler = StandardScaler() # used for all functions
 
 def testing_accuracy(dataframe):
@@ -19,7 +18,7 @@ def testing_accuracy(dataframe):
     X_train, X_test, y_train, y_test = train_test_sets(dataframe)
     X_train_scaled = scaling(X_train, scaler)
     X_test_scaled = scaling(X_test, scaler, False)
-    random_forest = RandomForestClassifier(random_state= 42, bootstrap= False, class_weight= 'balanced', criterion= 'entropy', max_depth= 120, max_features= 'sqrt', min_samples_leaf= 6, min_samples_split= 6, n_estimators= 1000)
+    random_forest = RandomForestClassifier(random_state=42, bootstrap= False, class_weight= 'balanced', criterion= 'entropy', max_depth= 160, max_features= 'sqrt', min_samples_leaf= 6, min_samples_split= 6, n_estimators= 1200)
     random_forest.fit(X_train_scaled, y_train)
     y_pred = random_forest.predict(X_test_scaled)
     accuracy = accuracy_score(y_test, y_pred)
@@ -27,19 +26,19 @@ def testing_accuracy(dataframe):
     print("Accuracy:", accuracy)
     print("Balanced Accuracy:", balanced_accuracy)
 
-testrun = testing_accuracy(data)
+#testrun = testing_accuracy(final_df)
 
 def create_submission_randomforest(dataframe, newfilename):
     """Trains a random forest model with all training data to create a file to use for submission in Kaggle."""
-    X_train = data.drop(columns=["target_feature"], axis=1)
+    X_train = final_df.drop(columns=["target_feature"], axis=1)
     y_train = final_df["target_feature"] 
     X_train_scaled = scaling(X_train, scaler)
     X_train_scaled = pd.DataFrame(X_train_scaled, columns=X_train.columns, index=X_train.index)
-    random_forest = RandomForestClassifier(bootstrap= False, class_weight= 'balanced', criterion= 'gini', max_depth= 14, max_features= 'sqrt', min_samples_leaf= 5, min_samples_split= 7, n_estimators= 1200)
+    random_forest = RandomForestClassifier(random_state=42, bootstrap= False, class_weight= 'balanced', criterion= 'entropy', max_depth= 160, max_features= 'sqrt', min_samples_leaf= 6, min_samples_split= 6, n_estimators= 1200)
     random_forest.fit(X_train_scaled, y_train)
     submission(random_forest, newfilename, scaler)
 
-#run = create_submission_randomforest(data, "predictions_output15.csv")
+run = create_submission_randomforest(final_df, "predictions_output15.csv")
 
 
 
