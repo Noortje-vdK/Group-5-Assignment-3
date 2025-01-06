@@ -22,10 +22,10 @@ rf_parameters = {'random_state':42,
                  'min_samples_split': 6, 
                  'n_estimators': 1200}
 
-def testing_accuracy(dataframe, rf_params):
+def testing_accuracy(df, rf_params):
     """Trains a random forest model with 80% of the training data to estimate its performance 
     by returning the accuracy and balanced accuracy."""
-    X_train, X_test, y_train, y_test = train_test_sets(dataframe)
+    X_train, X_test, y_train, y_test = train_test_sets(df)
     X_train_scaled = scaling(X_train, scaler)
     X_test_scaled = scaling(X_test, scaler, False)
     random_forest = RandomForestClassifier(**rf_params)
@@ -38,11 +38,11 @@ def testing_accuracy(dataframe, rf_params):
 
 testrun = testing_accuracy(final_df, rf_parameters)
 
-def create_submission_randomforest(dataframe, rf_params, newfilename):
+def create_submission_randomforest(df, rf_params, newfilename):
     """Trains a random forest model with all training data to create a csv file to use for submission in Kaggle.
     This file has one column with Unique_ID, and one column with the predicted class 0 or 1."""
-    X_train = final_df.drop(columns=["target_feature", "SMILES_canonical"], axis=1) # only features for training
-    y_train = final_df["target_feature"] 
+    X_train = df.drop(columns=["target_feature", "SMILES_canonical"], axis=1) # only features for training
+    y_train = df["target_feature"] 
     X_train_scaled = scaling(X_train, scaler)
     X_train_scaled = pd.DataFrame(X_train_scaled, columns=X_train.columns, index=X_train.index) # keep feature names the same
     random_forest = RandomForestClassifier(**rf_params)

@@ -19,11 +19,11 @@ def data_processing(filename, testing = True):
 
 def getMolDescriptors(mol, missingVal=None):
     """For given molecule, calculate all molecular descriptors and returns it in a dictionary."""
-    descriptors = {}
+    descriptors = {} # dictionary that holds descriptors and the values for 1 molecule
     for name, function in Descriptors.descList:
         try:
             value = function(mol)
-        except Exception as e:
+        except Exception as e: # put missingVal as value in case of error
             print(f"Error calculating {name}: {e}")
             value = missingVal
         descriptors[name] = value
@@ -31,11 +31,11 @@ def getMolDescriptors(mol, missingVal=None):
 
 def calculate_descriptors(df):
     """For molecules in SMILES format, convert it to a RDkit molecule and calculate all descriptors for each molcule in dataframe."""
-    all_descriptors = []
+    all_descriptors = [] # list with the descriptor dictonaries for each molecule
     for index, row in df.iterrows():
         smile_molc = row["SMILES_canonical"]
         mol = Chem.MolFromSmiles(smile_molc) # get an RDkit molecule from the SMILES
-        if mol is None:
+        if mol is None: # skip over missing values
             print(f"Incorrect SMILES: {smile_molc}")
             continue
         molc_descr = getMolDescriptors(mol) # calculate all descriptors
@@ -43,18 +43,18 @@ def calculate_descriptors(df):
     descriptors_df = pd.DataFrame(all_descriptors)
     return descriptors_df
 
-def remove_correlated_variables(data, threshold):
+def remove_correlated_variables(df, threshold):
     """From data that only has numerical or binary columns, remove columns with variables that are highly correlated: 
     that have a correlation coefficient above the threshold."""
-    corr_matrix = data.drop(columns=["target_feature"]).corr()
+    corr_matrix = df.drop(columns=["target_feature"]).corr()
     upper_triangle = corr_matrix.where(np.triu(np.ones(corr_matrix.shape, dtype=bool), k=1)) # look only at upper triangle without diagonal to prevent removing both variables if correlated
     to_drop = [col for col in upper_triangle.columns if any(upper_triangle[col] > threshold)] # drop columns if correlation coefficient exceeds threshold
-    return data.drop(columns=to_drop)
+    return df.drop(columns=to_drop)
 
-def train_test_sets(X):
+def train_test_sets(df):
     """Splits dataframe X in training (0.8) and test (0.2) set."""
-    input = X.drop(columns=["SMILES_canonical", "target_feature"], axis=1) # input is only the descriptors
-    output = X["target_feature"]
+    input = df.drop(columns=["SMILES_canonical", "target_feature"], axis=1) # input is only the descriptors
+    output = df["target_feature"]
     X_train, X_test, y_train, y_test = train_test_split(input, output, test_size=0.2, random_state=42)
     return X_train, X_test, y_train, y_test
 
@@ -66,7 +66,7 @@ def scaling(data, scaler, fit = True):
     else:
         return scaler.transform(data)
 
-def submission(model, newfile, scaler, testfile="test.csv"):
+def submission(model, newfilename, scaler, testfile="test.csv"):
     """Processes a new file, predicts the output for this file and write a new csv file with the results."""
     new_data = data_processing(testfile, False)
     new_descriptors = calculate_descriptors(new_data)
@@ -76,4 +76,4 @@ def submission(model, newfile, scaler, testfile="test.csv"):
     predictions = model.predict(new_descriptors_scaled)
     new_data['target_feature'] = predictions
     new_data['target_feature'] = new_data['target_feature'].astype(str) # prevent that zeroes get removed while writing the file
-    new_data[['Unique_ID', 'target_feature']].to_csv(newfile, index=False, quoting=1) # quoting = 1 ensures that dataframa is copied entirely to csv file
+    new_data[['Unique_ID', 'target_feature']].to_csv(newfilename, index=False, quoting=1) # quoting = 1 ensures that dataframa is copied entirely to csv file
