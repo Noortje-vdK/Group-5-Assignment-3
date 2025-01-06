@@ -17,7 +17,7 @@ def hyperparameters_randomsearch(filename):
     max_depth.append(None)
     min_samples_split = [int(x) for x in np.linspace(start=2, stop=12, num=6)]
     min_samples_leaf = [int(x) for x in np.linspace(start=4, stop=8, num=4)]
-    bootstrap = [False]
+    bootstrap = [False, True]
     criterion = ['entropy', "gini", "log_loss"]
     class_weight = ['balanced', "balanced_subsample"]
 
@@ -36,12 +36,13 @@ def hyperparameters_randomsearch(filename):
     rf_random = RandomizedSearchCV(
         estimator=rf,
         param_distributions=random_grid,
-        n_iter=50,
-        cv=3,
-        verbose=2,
+        n_iter=50, # number of combinations tested
+        cv=3, # amount of folds
+        verbose=2, # to show the progress
         random_state=42,
-        n_jobs=-1)
-
+        n_jobs=-1) # use all cores for speed
+    
+    # perform same steps on data as in the model 
     training_data = data_processing(filename, True)
     train_descriptors = calculate_descriptors(training_data)
     final_df = pd.concat([training_data.reset_index(drop=True), train_descriptors], axis=1)
@@ -52,8 +53,7 @@ def hyperparameters_randomsearch(filename):
     rf_random.fit(X_train_scaled, y_train)
 
     best_params = rf_random.best_params_
-
-    best_model = rf_random.best_estimator_
+    best_model = rf_random.best_estimator_ # model using the found parameters
     y_pred = best_model.predict(X_test_scaled)
     balanced_accuracy = balanced_accuracy_score(y_test, y_pred)
 
@@ -73,7 +73,8 @@ def hyperparameters_gridsearch(filename):
         'bootstrap': [True, False],
         'criterion' : ["gini", 'entropy'],
         'class_weight' : ['balanced', 'balanced_subsample']}
-
+    
+    # perform same steps to the data as in the model
     training_data = data_processing(filename, True)
     train_descriptors = calculate_descriptors(training_data)
     final_df = pd.concat([training_data.reset_index(drop=True), train_descriptors], axis=1)
@@ -86,10 +87,10 @@ def hyperparameters_gridsearch(filename):
     grid_search = GridSearchCV(
         estimator=rf,
         param_grid=param_grid,
-        cv=3,
-        n_jobs=-1,
-        verbose=2,
-        scoring='balanced_accuracy')
+        cv=3, # amount of folds
+        n_jobs=-1, # use all cores for speed
+        verbose=2, # print progress
+        scoring='balanced_accuracy') 
 
     grid_search.fit(X_train_scaled, y_train)
 
